@@ -1,26 +1,54 @@
-cmake_minimum_required(VERSION 3.30)
-include(pico_sdk_import.cmake)
+cmake_minimum_required(VERSION 3.13)
 
-set(PICO_BOARD pico_w)
+# Set path to Pico-sdk
+if (NOT PICO_SDK_PATH)
+    if(DEFINED ENV{PICO_SDK_PATH})
+        set(PICO_SDK_PATH $ENV{PICO_SDK_PATH})
+        message("Setting PICO_SDK_PATH from environment ('${PICO_SDK_PATH}')")
+    else()
+        set(PICO_SDK_PATH ${CMAKE_CURRENT_LIST_DIR}/pico-sdk)
+        message("Setting PICO_SDK_PATH from git submodule path ('${PICO_SDK_PATH}')")
+    endif()
+else()
+    message("PICO_SDK_PATH is ('${PICO_SDK_PATH}')")
+endif()
 
-project(blink C CXX ASM)
+# Set path to TinyUSB
+if (NOT PICO_TINYUSB_PATH)
+    if(DEFINED ENV{PICO_TINYUSB_PATH})
+        set(PICO_TINYUSB_PATH $ENV{PICO_TINYUSB_PATH})
+        message("Setting PICO_TINYUSB_PATH from environment ('${PICO_TINYUSB_PATH}')")
+    else()
+        set(PICO_TINYUSB_PATH ${CMAKE_CURRENT_LIST_DIR}/tinyusb)
+        message("Setting PICO_TINYUSB_PATH from git submodule path ('${PICO_TINYUSB_PATH}')")
+    endif()
+else()
+    message("PICO_TINYUSB_PATH is ('${PICO_TINYUSB_PATH}')")
+endif()
 
+# Set path to Pico-PIO-USB
+if (NOT PICO_PIO_USB_PATH)
+    if(DEFINED ENV{PICO_PIO_USB_PATH})
+        set(PICO_PIO_USB_PATH $ENV{PICO_PIO_USB_PATH})
+        message("Setting PICO_PIO_USB_PATH from environment ('${PICO_PIO_USB_PATH}')")
+    else()
+        set(PICO_PIO_USB_PATH ${PICO_TINYUSB_PATH}/hw/mcu/raspberry_pi/Pico-PIO-USB)
+        message("Setting PICO_PIO_USB_PATH from git submodule path ('${PICO_PIO_USB_PATH}')")
+    endif()
+else()
+    message("PICO_PIO_USB_PATH is ('${PICO_PIO_USB_PATH}')")
+endif()
+
+# For TinyUSB
+set(FAMILY rp2040)
+
+# Include pico_sdk_import.cmake from pico-sdk (instead of copying)
+include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+
+# Generic setup
+set(PROJECT copy-pasta)
+project(${PROJECT})
+
+
+# Initialize Pico-SDK
 pico_sdk_init()
-
-# This version should behave exactly the same, but it runs the sys clock slowly.
-add_executable(main
-  main.c
-)
-target_link_libraries(main
-  pico_stdlib              # for core functionality
-  pico_cyw43_arch_none     # we need Wifi to access the GPIO, but we don't need anything else
-  hardware_clocks
-)
-# This requires us to modify the pio divisor to successfully communicate with the cyw43 chip
-target_compile_definitions(
-  main PRIVATE
-  CYW43_PIO_CLOCK_DIV_DYNAMIC=1
-)
-
-# create map/bin/hex file etc.
-pico_add_extra_outputs(main)
