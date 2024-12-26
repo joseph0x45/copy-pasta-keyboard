@@ -4,11 +4,6 @@
 #include "hardware/clocks.h"
 
 int main() {
-    // Slow the sys clock down and speed up the cyw43 pio to compensate
-    // By default the pio used to communicate with cyw43 runs with a clock divisor of 2
-    // if you modify the clock you will have to compensate for this
-    // As an alternative you could specify CYW43_PIO_CLOCK_DIV_INT=x CYW43_PIO_CLOCK_DIV_FRAC=y in your cmake file
-    // To call cyw43_set_pio_clock_divisor you have to add CYW43_PIO_CLOCK_DIV_DYNAMIC=1 to your cmake file
     set_sys_clock_khz(18000, true);
     cyw43_set_pio_clock_divisor(1, 0);
 
