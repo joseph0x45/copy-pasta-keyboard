@@ -1,5 +1,5 @@
-import time
 import board
+import time
 from digitalio import DigitalInOut, Direction, Pull
 import usb_hid
 from adafruit_hid.keyboard import Keyboard
@@ -12,14 +12,14 @@ led.direction = Direction.OUTPUT
 
 switchCopy = DigitalInOut(board.GP0)
 switchCopy.direction = Direction.INPUT
-switchCopy.pull = Pull.UP
+switchCopy.pull = Pull.DOWN
 switchPaste = DigitalInOut(board.GP1)
 switchPaste.direction = Direction.INPUT
-switchPaste.pull = Pull.UP
+switchPaste.pull = Pull.DOWN
 
 while True:
-    if not switchCopy.value:
+    if switchCopy.value:
         keyboard.send(Keycode.CONTROL, Keycode.C)
-    if not switchPaste.value:
+    elif switchPaste.value:
         keyboard.send(Keycode.CONTROL, Keycode.V)
-    time.sleep(0.25)  # debounce delay
+    time.sleep(0.5)
